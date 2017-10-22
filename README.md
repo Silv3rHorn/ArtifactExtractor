@@ -12,3 +12,6 @@ None if using release executable. Else, see [reuqirements](https://github.com/Si
 1. Download latest release from [Releases](https://github.com/Silv3rHorn/ArtifactExtractor/releases)
 2. Create destination directory
 3. `artifact_extractor.exe <source image> <dest dir>`
+
+## Credits
+Joachim Metz and his libraries
