@@ -5,7 +5,7 @@ Artifacts in VSCs will be checked (via hash) if they are different from a later 
 
 
 ## Dependencies
-None if using release executable. Else, see [reuqirements](https://github.com/Silv3rHorn/ArtifactExtractor/blob/master/requirements.txt).
+None if using release executable. Else, see [requirements](https://github.com/Silv3rHorn/ArtifactExtractor/blob/master/requirements.txt).
 
 
 ## Usage
