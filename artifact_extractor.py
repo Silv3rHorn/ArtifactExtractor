@@ -10,9 +10,13 @@ import os
 import sys
 import vsm
 
+from datetime import datetime as dt
 from dfvfs.lib import definitions
 from dfvfs.helpers import volume_scanner
 from dfvfs.resolver import resolver
+from win32file import SetFileTime, CreateFile, CloseHandle
+from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
+from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
 
 
 class ArtifactExtractor(volume_scanner.VolumeScanner):
@@ -67,6 +71,34 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
     ]
     _extracted = {}
 
+    @staticmethod
+    def _preserve_timestamps(file_entry, output_path):
+        accessed = created = modified = dt.now()
+        stat_object = file_entry.GetStat()
+
+        if stat_object.atime is not None:
+            if stat_object.atime_nano is not None:
+                accessed = dt.fromtimestamp((float(str(stat_object.atime) + '.' + str(stat_object.atime_nano))))
+            else:
+                accessed = dt.fromtimestamp(stat_object.atime)
+
+        if stat_object.crtime is not None:
+            if stat_object.crtime_nano is not None:
+                created = dt.fromtimestamp((float(str(stat_object.crtime) + '.' + str(stat_object.crtime_nano))))
+            else:
+                created = dt.fromtimestamp(stat_object.crtime)
+
+        if stat_object.mtime is not None:
+            if stat_object.mtime_nano is not None:
+                modified = dt.fromtimestamp((float(str(stat_object.mtime) + '.' + str(stat_object.mtime_nano))))
+            else:
+                modified = dt.fromtimestamp(stat_object.mtime)
+
+        handle = CreateFile(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+                            None)
+        SetFileTime(handle, created, accessed, modified)  # does not seem to preserve nano precision of timestamps
+        CloseHandle(handle)
+
     def _check_unique(self, file_entry, md5):
         """ Checks if file of the same hash has been previously extracted"""
 
@@ -108,6 +140,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
             if not self._check_unique(file_entry, md5_obj.hexdigest()):
                 os.remove(output_path)
+            else:
+                self._preserve_timestamps(file_entry, output_path)
         except IOError:
             pass
 

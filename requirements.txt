@@ -19,3 +19,4 @@ pycrypto >= 2.6.0
 pytsk3 >= 20160721
 six >= 1.1.0
 dfvfs >= 20160918
+pywin32 >= 221
