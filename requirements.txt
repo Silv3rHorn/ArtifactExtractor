@@ -1,9 +1,7 @@
 pip >= 7.0.0
-backports.lzma
 construct >= 2.5.2,<= 2.5.3
 dfdatetime >= 20160814
 libbde-python >= 20140531
-pyewf == 20140608.1
 libfsntfs-python >= 20151130
 libfvde-python >= 20160719
 libfwnt-python >= 20160418
@@ -19,4 +17,6 @@ pycrypto >= 2.6.0
 pytsk3 >= 20160721
 six >= 1.1.0
 dfvfs >= 20160918
+backports.lzma
 pywin32 >= 221
+pyewf == 20140608.1

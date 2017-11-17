@@ -14,7 +14,7 @@ from datetime import datetime as dt
 from dfvfs.lib import definitions
 from dfvfs.helpers import volume_scanner
 from dfvfs.resolver import resolver
-from win32file import SetFileTime, CreateFile, CloseHandle
+from win32file import SetFileTime, CreateFileW, CloseHandle
 from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
 from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
 
@@ -94,8 +94,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 modified = dt.fromtimestamp(stat_object.mtime)
 
-        handle = CreateFile(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-                            None)
+        handle = CreateFileW(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+                             None)
         SetFileTime(handle, created, accessed, modified)  # does not seem to preserve nano precision of timestamps
         CloseHandle(handle)
 

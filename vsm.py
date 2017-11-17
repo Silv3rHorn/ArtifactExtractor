@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Script to recursively calculate a message digest hash for every file."""
+"""Script to open and parse the evidence image."""
 
 from __future__ import print_function
 import datetime as dt
@@ -225,10 +225,10 @@ class VolumeScannerMediator(volume_scanner.VolumeScannerMediator):
             print(u'You can abort with Ctrl^C.')
 
             selected_vss_stores = sys.stdin.readline()
-
             selected_vss_stores = selected_vss_stores.strip()
+
             if not selected_vss_stores:
-                break
+                selected_vss_stores = []
             try:
                 selected_vss_stores = self._parse_vss_stores_string(selected_vss_stores)
             except ValueError:
