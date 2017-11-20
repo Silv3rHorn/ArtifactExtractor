@@ -8,6 +8,7 @@ import hashlib
 import logging
 import os
 import sys
+import artifacts
 import vsm
 
 from datetime import datetime as dt
@@ -23,52 +24,6 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
     """Class that extracts common Windows artifacts."""
 
     _READ_BUFFER_SIZE = 32768  # Class constant that defines the default read buffer size
-    _LOC_REG = u'/Windows/System32/config/'
-    _LOC_WINEVT = u'/Windows/System32/winevt/logs/'
-    _LOC_APPCOMPAT = u'/Windows/AppCompat/Programs/'
-    _LOC_RECENT = u'/AppData/Roaming/Microsoft/Windows/Recent/'
-    _SYSTEM_ARTIFACTS = [
-        [_LOC_REG + u'SAM', u'/Registry/'],
-        [_LOC_REG + u'SECURITY', u'/Registry/'],
-        [_LOC_REG + u'SOFTWARE', u'/Registry/'],
-        [_LOC_REG + u'SYSTEM', u'/Registry/'],
-
-        [_LOC_REG + u'RegBack/SAM', u'/Registry/RegBack/'],
-        [_LOC_REG + u'RegBack/SECURITY', u'/Registry/RegBack/'],
-        [_LOC_REG + u'RegBack/SOFTWARE', u'/Registry/RegBack/'],
-        [_LOC_REG + u'RegBack/SYSTEM', u'/Registry/RegBack/'],
-
-        [_LOC_WINEVT + u'Application.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Security.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Setup.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'System.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-DriverFrameworks-UserMode-Operational.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-PowerShell%4Operational.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-TaskScheduler%4Operational.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-TerminalServices-LocalSessionManager%4Operational.evtx', u'/OSLogs/'],
-        [_LOC_WINEVT + u'Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx', u'/OSLogs/'],
-
-        [_LOC_APPCOMPAT + u'Amcache.hve', u'/MRU/Prog/'],
-        [_LOC_APPCOMPAT + u'Programs/RecentFileCache.bcf', u'/MRU/Prog/'],
-
-        [u'/Windows/Inf/setupapi.dev.log', u'/Registry/']
-    ]
-    _SYSTEM_ARTIFACTS_DIR = [
-        [u'/Windows/Prefetch', u'/MRU/Prog/prefetch/'],
-        [u'/Windows/System32/sru', u'/MRU/Prog/srum/'],
-        [u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/']
-    ]
-    _USER_ARTIFACTS = [
-        [u'/NTUSER.DAT', u'/Registry/'],
-        [u'/AppData/Local/Microsoft/Windows/UsrClass.dat', u'/Registry/']
-    ]
-    _USER_ARTIFACTS_DIR = [
-        [_LOC_RECENT, u'/MRU/Files/lnk/'],
-        [_LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/'],
-        [_LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/'],
-        [u'/AppData/Local/Microsoft/Windows/WebCache', u'/MRU/Files/webcache/']
-    ]
     _extracted = {}
 
     @staticmethod
@@ -150,9 +105,11 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name), False)
 
     @staticmethod
-    def _get_file_entry(base_path_spec, artifact_location):
+    def _get_file_entry(base_path_spec, artifact_location, data_stream=None):
         path_spec = base_path_spec
         path_spec.location = artifact_location
+        if data_stream:
+            path_spec.data_stream = data_stream
         file_entry = resolver.Resolver.OpenFileEntry(path_spec)
         if file_entry:
             return file_entry
@@ -195,7 +152,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 print(u"Processing " + base_path_spec.parent.type_indicator + u'...')
 
-            for artifact in self._SYSTEM_ARTIFACTS:
+            for artifact in artifacts.SYSTEM_FILE:
                 file_entry = self._get_file_entry(base_path_spec, artifact[0])
                 if file_entry is None:
                     continue
@@ -207,7 +164,19 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     output_path = os.path.join(output_path, artifact[0].split('/')[-1])
                     self.export_file(file_entry, output_path)
 
-            for artifact in self._SYSTEM_ARTIFACTS_DIR:
+            for artifact in artifacts.FILE_ADS:
+                file_entry = self._get_file_entry(base_path_spec, artifact[0], artifact[2])
+                if file_entry is None:
+                    continue
+                output_path = self._get_output_path(output_base_dir, artifact[1])
+
+                if base_path_spec.parent.type_indicator == 'VSHADOW':
+                    self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[0].split('/')[-1]))
+                else:
+                    output_path = os.path.join(output_path, artifact[0].split('/')[-1])
+                    self.export_file(file_entry, output_path)
+
+            for artifact in artifacts.SYSTEM_DIR:
                 file_entry = self._get_file_entry(base_path_spec, artifact[0])
                 if file_entry is None:
                     continue
@@ -227,7 +196,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     dir_name = user_file_entry.path_spec.location.split('/')[-1]
                     if dir_name not in ['All Users', 'Default', 'Default User', 'Default.migrated', 'Public']:
 
-                        for artifact in self._USER_ARTIFACTS:
+                        for artifact in artifacts.USER_FILE:
                             artifact_location = user_file_entry.path_spec.location + artifact[0]
                             file_entry = self._get_file_entry(base_path_spec, artifact_location)
                             if file_entry is None:
@@ -242,7 +211,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                                 output_path = os.path.join(output_path, 'Users', dir_name, artifact[0].split('/')[-1])
                                 self.export_file(file_entry, output_path)
 
-                        for artifact in self._USER_ARTIFACTS_DIR:
+                        for artifact in artifacts.USER_DIR:
                             artifact_location = user_file_entry.path_spec.location + artifact[0]
                             file_entry = self._get_file_entry(base_path_spec, artifact_location)
                             if file_entry is None:
