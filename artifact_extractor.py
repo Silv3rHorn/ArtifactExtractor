@@ -5,6 +5,7 @@
 from __future__ import print_function
 import argparse
 import hashlib
+import itertools
 import logging
 import os
 import sys
@@ -19,6 +20,8 @@ from win32file import SetFileTime, CreateFileW, CloseHandle
 from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
 from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
 
+LOG_FILE = ''
+
 
 class ArtifactExtractor(volume_scanner.VolumeScanner):
     """Class that extracts common Windows artifacts."""
@@ -31,20 +34,20 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
         accessed = created = modified = dt.now()
         stat_object = file_entry.GetStat()
 
-        if stat_object.atime is not None:
-            if stat_object.atime_nano is not None:
+        if stat_object.atime:
+            if stat_object.atime_nano:
                 accessed = dt.fromtimestamp((float(str(stat_object.atime) + '.' + str(stat_object.atime_nano))))
             else:
                 accessed = dt.fromtimestamp(stat_object.atime)
 
-        if stat_object.crtime is not None:
-            if stat_object.crtime_nano is not None:
+        if stat_object.crtime:
+            if stat_object.crtime_nano:
                 created = dt.fromtimestamp((float(str(stat_object.crtime) + '.' + str(stat_object.crtime_nano))))
             else:
                 created = dt.fromtimestamp(stat_object.crtime)
 
-        if stat_object.mtime is not None:
-            if stat_object.mtime_nano is not None:
+        if stat_object.mtime:
+            if stat_object.mtime_nano:
                 modified = dt.fromtimestamp((float(str(stat_object.mtime) + '.' + str(stat_object.mtime_nano))))
             else:
                 modified = dt.fromtimestamp(stat_object.mtime)
@@ -71,49 +74,53 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
         """ Outputs a path specification to the specified path"""
 
         md5_obj = hashlib.md5()
-        if recursive:
+        if file_entry.IsDirectory():
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-        else:
+            for sub_file_entry in file_entry.sub_file_entries:
+                if recursive and sub_file_entry.IsDirectory():
+                    self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name), True)
+                elif not sub_file_entry.IsDirectory():
+                    self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name))
+        elif file_entry.IsFile():
             if not os.path.exists(os.path.dirname(output_path)):
                 os.makedirs(os.path.dirname(output_path))
 
-        try:
-            in_file = file_entry.GetFileObject()
-            output = open(output_path, "wb")
+            try:
+                in_file = file_entry.GetFileObject()
+                output = open(output_path, "wb")
 
-            data = in_file.read(self._READ_BUFFER_SIZE)
-            while data:
-                md5_obj.update(data)
-                output.write(data)
                 data = in_file.read(self._READ_BUFFER_SIZE)
+                while data:
+                    md5_obj.update(data)
+                    output.write(data)
+                    data = in_file.read(self._READ_BUFFER_SIZE)
 
-            if output:
-                output.close()
-            if in_file:
-                in_file.close()
+                if output:
+                    output.close()
+                if in_file:
+                    in_file.close()
 
-            if not self._check_unique(file_entry, md5_obj.hexdigest()):
-                os.remove(output_path)
-            else:
-                self._preserve_timestamps(file_entry, output_path)
-        except IOError:
-            pass
-
-        if recursive:
-            for sub_file_entry in file_entry.sub_file_entries:
-                self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name), False)
+                if not self._check_unique(file_entry, md5_obj.hexdigest()):
+                    os.remove(output_path)
+                    logging.info("Duplicate:\t{}\t{}".format(output_path, md5_obj.hexdigest()))
+                else:
+                    self._preserve_timestamps(file_entry, output_path)
+                    logging.info("Extracted:\t{}\t{}".format(output_path, md5_obj.hexdigest()))
+            except IOError:
+                logging.error("IOError:\t{}".format(output_path))
+                pass
 
     @staticmethod
     def _get_file_entry(base_path_spec, artifact_location, data_stream=None):
         path_spec = base_path_spec
         path_spec.location = artifact_location
-        if data_stream:
-            path_spec.data_stream = data_stream
+        path_spec.data_stream = data_stream
         file_entry = resolver.Resolver.OpenFileEntry(path_spec)
         if file_entry:
             return file_entry
         else:
+            logging.error("Missing:\t{}".format(artifact_location))
             return None
 
     @staticmethod
@@ -134,7 +141,6 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             if base_path_spec.parent.type_indicator != 'VSHADOW':
                 base_path_specs.insert(0, base_path_specs.pop(base_path_specs.index(base_path_spec)))
 
-        print('')
         for base_path_spec in base_path_specs:
             try:
                 file_entry = resolver.Resolver.OpenFileEntry(base_path_spec)
@@ -144,6 +150,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             if file_entry is None:
                 logging.warning(u'Unable to open base path specification:\n{0:s}'.format(base_path_spec.comparable))
                 continue
+
             vsc_dir = ''
             if base_path_spec.parent.type_indicator == 'VSHADOW':
                 print(u"Processing " + base_path_spec.parent.type_indicator + u' (' +
@@ -152,42 +159,28 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 print(u"Processing " + base_path_spec.parent.type_indicator + u'...')
 
-            for artifact in artifacts.SYSTEM_FILE:
-                file_entry = self._get_file_entry(base_path_spec, artifact[0])
+            for artifact in itertools.chain(artifacts.SYSTEM_FILE, artifacts.SYSTEM_DIR, artifacts.FILE_ADS):
+                if len(artifact) == 3 and artifact in artifacts.FILE_ADS:  # extract ADS (artifacts.FILE_ADS)
+                    file_entry = self._get_file_entry(base_path_spec, artifact[0], artifact[2])
+                else:
+                    file_entry = self._get_file_entry(base_path_spec, artifact[0], None)
                 if file_entry is None:
                     continue
+
                 output_path = self._get_output_path(output_base_dir, artifact[1])
-
                 if base_path_spec.parent.type_indicator == 'VSHADOW':
-                    self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[0].split('/')[-1]))
+                    if file_entry.IsFile():  # artifacts.SYSTEM_FILE
+                        self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[0].split('/')[-1]))
+                    elif file_entry.IsDirectory():    # artifacts.SYSTEM_DIR
+                        self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[2])
                 else:
-                    output_path = os.path.join(output_path, artifact[0].split('/')[-1])
-                    self.export_file(file_entry, output_path)
+                    if file_entry.IsFile():  # artifacts.SYSTEM_FILE
+                        output_path = os.path.join(output_path, artifact[0].split('/')[-1])
+                        self.export_file(file_entry, output_path)
+                    elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
+                        self.export_file(file_entry, output_path, artifact[2])
 
-            for artifact in artifacts.FILE_ADS:
-                file_entry = self._get_file_entry(base_path_spec, artifact[0], artifact[2])
-                if file_entry is None:
-                    continue
-                output_path = self._get_output_path(output_base_dir, artifact[1])
-
-                if base_path_spec.parent.type_indicator == 'VSHADOW':
-                    self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[0].split('/')[-1]))
-                else:
-                    output_path = os.path.join(output_path, artifact[0].split('/')[-1])
-                    self.export_file(file_entry, output_path)
-
-            for artifact in artifacts.SYSTEM_DIR:
-                file_entry = self._get_file_entry(base_path_spec, artifact[0])
-                if file_entry is None:
-                    continue
-                output_path = self._get_output_path(output_base_dir, artifact[1])
-
-                if base_path_spec.parent.type_indicator == 'VSHADOW':
-                    self.export_file(file_entry, os.path.join(output_path, vsc_dir), True)
-                else:
-                    self.export_file(file_entry, output_path, True)
-
-            users_file_entry = self._get_file_entry(base_path_spec, '/Users')
+            users_file_entry = self._get_file_entry(base_path_spec, '/Users', None)
             if users_file_entry is None:
                 continue
             for user_file_entry in users_file_entry.sub_file_entries:
@@ -198,7 +191,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
                         for artifact in artifacts.USER_FILE:
                             artifact_location = user_file_entry.path_spec.location + artifact[0]
-                            file_entry = self._get_file_entry(base_path_spec, artifact_location)
+                            file_entry = self._get_file_entry(base_path_spec, artifact_location, None)
                             if file_entry is None:
                                 continue
                             output_path = self._get_output_path(output_base_dir, artifact[1])
@@ -213,15 +206,15 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
                         for artifact in artifacts.USER_DIR:
                             artifact_location = user_file_entry.path_spec.location + artifact[0]
-                            file_entry = self._get_file_entry(base_path_spec, artifact_location)
+                            file_entry = self._get_file_entry(base_path_spec, artifact_location, None)
                             if file_entry is None:
                                 continue
                             output_path = os.path.join(self._get_output_path(output_base_dir, artifact[1]), dir_name)
 
                             if base_path_spec.parent.type_indicator == 'VSHADOW':
-                                self.export_file(file_entry, os.path.join(output_path, vsc_dir), True)
+                                self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[2])
                             else:
-                                self.export_file(file_entry, output_path, True)
+                                self.export_file(file_entry, output_path, artifact[2])
 
 
 def main():
@@ -238,41 +231,37 @@ def main():
     options = argument_parser.parse_args()
 
     if not options.source or not options.dest:
-        print(u'One or more arguments is missing.')
-        print(u'')
+        print(u'One or more arguments is missing.\n')
         argument_parser.print_help()
         print(u'')
         return False
 
-    logging.basicConfig(level=logging.INFO, format=u'[%(levelname)s] %(message)s')
+    date_timestamp = dt.now()
+    global LOG_FILE
+    LOG_FILE = os.path.join(options.dest, "_logfile.{}.txt".format(date_timestamp.strftime("%Y-%m-%d@%H%M%S")))
+    logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=u'[%(levelname)s] %(message)s')
 
-    return_value = True
     mediator = vsm.VolumeScannerMediator()
     artifact_extractor = ArtifactExtractor(mediator=mediator)
 
     try:
         base_path_specs = artifact_extractor.GetBasePathSpecs(options.source)
         if not base_path_specs:
-            print(u'No supported file system found in source.')
-            print(u'')
+            print(u'No supported file system found in source.\n')
             return False
 
         if os.path.exists(options.dest):
+            print(u'')
             artifact_extractor.extract_artifacts(base_path_specs, options.dest)
         else:
-            print(u'Cannot find destination directory.')
-            print(u'')
+            print(u'Cannot find destination directory.\n')
             return False
-
-        print(u'')
-        print(u'Completed.')
-
     except KeyboardInterrupt:
-        return_value = False
-        print(u'')
-        print(u'Aborted by user.')
+        print(u'\nAborted by user.')
+        return False
 
-    return return_value
+    print(u'\nCompleted.')
+    return True
 
 
 if __name__ == '__main__':
