@@ -239,11 +239,7 @@ def main():
     date_timestamp = dt.now()
     global LOG_FILE
     LOG_FILE = os.path.join(options.dest, "_logfile.{}.txt".format(date_timestamp.strftime("%Y-%m-%d@%H%M%S")))
-    handler = logging.FileHandler(LOG_FILE, 'w', 'utf-8')
-    formatter = logging.Formatter(u'[%(levelname)s] %(message)s')
-    handler.setFormatter(formatter)
-    logging.getLogger().setLevel(logging.INFO)
-    logging.getLogger().addHandler(handler)
+    logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=u'[%(levelname)s] %(message)s')
 
     mediator = vsm.VolumeScannerMediator()
     artifact_extractor = ArtifactExtractor(mediator=mediator)
