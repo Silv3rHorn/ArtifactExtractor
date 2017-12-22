@@ -5,7 +5,7 @@ Artifacts in VSCs will be checked (via hash) if they are different from a later 
 
 
 ## Dependencies
-None if using release executable. 
+None if using **release executable**. 
 
 Else, install from [requirements](https://github.com/Silv3rHorn/ArtifactExtractor/blob/master/requirements.txt) - `pip -r requirements.txt`. Install dependencies with errors separately:
 1. Install backports.lzma from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#backports.lzma)
@@ -14,7 +14,7 @@ Else, install from [requirements](https://github.com/Silv3rHorn/ArtifactExtracto
 ## Usage
 1. Download latest release from [Releases](https://github.com/Silv3rHorn/ArtifactExtractor/releases)
 2. Create destination directory
-3. `artifact_extractor.exe <source image> <dest dir>`
+3. `artifact_extractor.exe <source image> <dest dir> [-a <selected artifacts>]`
 
 ## Credits
 Joachim Metz and his libraries
