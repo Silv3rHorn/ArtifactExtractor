@@ -3,13 +3,14 @@
 """Script to extract common Windows artifacts from source image and its shadow copies."""
 
 from __future__ import print_function
-import argparse
 import hashlib
 import itertools
 import logging
 import os
 import sys
+
 import artifacts
+import artifact_selector
 import vsm
 
 from datetime import datetime as dt
@@ -135,7 +136,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
     def _get_vsc_ctime(base_path_spec):
         return vsm.VSS_CREATION_TIMESTAMPS[base_path_spec.parent.store_index + 1]
 
-    def extract_artifacts(self, base_path_specs, output_base_dir):
+    def extract_artifacts(self, base_path_specs, output_base_dir, selection):
         # Move non-vsc to front of list to be processed first
         for base_path_spec in base_path_specs:
             if base_path_spec.parent.type_indicator != 'VSHADOW':
@@ -174,61 +175,71 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
             output_part_dir = os.path.join(output_base_dir, partition)
             for artifact in itertools.chain(artifacts.SYSTEM_FILE, artifacts.SYSTEM_DIR, artifacts.FILE_ADS):
-                if len(artifact) == 3 and artifact in artifacts.FILE_ADS:  # extract ADS (artifacts.FILE_ADS)
-                    file_entry = self._get_file_entry(base_path_spec, artifact[0], artifact[2])
+                if artifact[0] not in selection:
+                    continue
+                if len(artifact) == 4 and artifact in artifacts.FILE_ADS:  # extract ADS (artifacts.FILE_ADS)
+                    file_entry = self._get_file_entry(base_path_spec, artifact[1], artifact[3])
                 else:
-                    file_entry = self._get_file_entry(base_path_spec, artifact[0], None)
+                    file_entry = self._get_file_entry(base_path_spec, artifact[1], None)
                 if file_entry is None:
                     continue
 
-                output_path = self._get_output_path(output_part_dir, artifact[1])
+                output_path = self._get_output_path(output_part_dir, artifact[2])
                 if base_path_spec.parent.type_indicator == 'VSHADOW':
                     if file_entry.IsFile():  # artifacts.SYSTEM_FILE
-                        self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[0].split('/')[-1]))
+                        self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[1].split('/')[-1]))
                     elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
-                        self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[2])
+                        self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[3])
                 else:
                     if file_entry.IsFile():  # artifacts.SYSTEM_FILE
-                        output_path = os.path.join(output_path, artifact[0].split('/')[-1])
+                        output_path = os.path.join(output_path, artifact[1].split('/')[-1])
                         self.export_file(file_entry, output_path)
                     elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
-                        self.export_file(file_entry, output_path, artifact[2])
+                        self.export_file(file_entry, output_path, artifact[3])
 
-            users_file_entry = self._get_file_entry(base_path_spec, '/Users', None)
+            if any(x in ['lnk_xp', 'iehist_xp', 'usrclass_xp'] for x in selection):
+                users_file_entry = self._get_file_entry(base_path_spec, '/Documents and Settings', None)
+            else:
+                users_file_entry = self._get_file_entry(base_path_spec, '/Users', None)
             if users_file_entry is None:
                 continue
             for user_file_entry in users_file_entry.sub_file_entries:
                 stat_object = user_file_entry.GetStat()
                 if stat_object.type == definitions.FILE_ENTRY_TYPE_DIRECTORY:
                     dir_name = user_file_entry.path_spec.location.split('/')[-1]
-                    if dir_name not in ['All Users', 'Default', 'Default User', 'Default.migrated', 'Public']:
+                    if dir_name not in ['All Users', 'Default', 'Default User', 'Default.migrated', 'Public',
+                                        'LocalService', 'NetworkService']:
 
                         for artifact in artifacts.USER_FILE:
-                            artifact_location = user_file_entry.path_spec.location + artifact[0]
+                            if artifact[0] not in selection:
+                                continue
+                            artifact_location = user_file_entry.path_spec.location + artifact[1]
                             file_entry = self._get_file_entry(base_path_spec, artifact_location, None)
                             if file_entry is None:
                                 continue
-                            output_path = self._get_output_path(output_part_dir, artifact[1])
+                            output_path = self._get_output_path(output_part_dir, artifact[2])
 
                             if base_path_spec.parent.type_indicator == 'VSHADOW':
                                 output_path = os.path.join(output_path, vsc_dir, 'Users', dir_name,
-                                                           artifact[0].split('/')[-1])
+                                                           artifact[1].split('/')[-1])
                                 self.export_file(file_entry, output_path)
                             else:
-                                output_path = os.path.join(output_path, 'Users', dir_name, artifact[0].split('/')[-1])
+                                output_path = os.path.join(output_path, 'Users', dir_name, artifact[1].split('/')[-1])
                                 self.export_file(file_entry, output_path)
 
                         for artifact in artifacts.USER_DIR:
-                            artifact_location = user_file_entry.path_spec.location + artifact[0]
+                            if artifact[0] not in selection:
+                                continue
+                            artifact_location = user_file_entry.path_spec.location + artifact[1]
                             file_entry = self._get_file_entry(base_path_spec, artifact_location, None)
                             if file_entry is None:
                                 continue
-                            output_path = os.path.join(self._get_output_path(output_part_dir, artifact[1]), dir_name)
+                            output_path = os.path.join(self._get_output_path(output_part_dir, artifact[2]), dir_name)
 
                             if base_path_spec.parent.type_indicator == 'VSHADOW':
-                                self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[2])
+                                self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[3])
                             else:
-                                self.export_file(file_entry, output_path, artifact[2])
+                                self.export_file(file_entry, output_path, artifact[3])
 
 
 def main():
@@ -236,18 +247,8 @@ def main():
     Returns:
         A boolean containing True if successful or False if not.
     """
-    argument_parser = argparse.ArgumentParser(description=(
-        'Extracts common Windows artifacts from source (including Volume Shadow Copies).'))
-    argument_parser.add_argument('source', nargs='?', metavar='image.raw', default=None, help=(
-        'path of the directory or filename of a storage media image containing the file.'))
-    argument_parser.add_argument('dest', nargs='?', metavar='destination', default=None, help=(
-        'destination directory where the output will be stored.'))
-    options = argument_parser.parse_args()
-
-    if not options.source or not options.dest:
-        print('One or more arguments is missing.\n')
-        argument_parser.print_help()
-        print('')
+    options = artifact_selector.get_selection()
+    if not options:
         return False
 
     date_timestamp = dt.now()
@@ -266,7 +267,7 @@ def main():
 
         if os.path.exists(options.dest):
             print('')
-            artifact_extractor.extract_artifacts(base_path_specs, options.dest)
+            artifact_extractor.extract_artifacts(base_path_specs, options.dest, options.artifact)
         else:
             print('Cannot find destination directory.\n')
             return False
