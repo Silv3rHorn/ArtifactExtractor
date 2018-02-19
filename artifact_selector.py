@@ -3,7 +3,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 
-def parse_selection(artifacts):
+def _parse_selection(artifacts):
     std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'evtl', 'setupapi', 'prefetch', 'amcache', 'srum', 'sccm', 'lnk',
              'jmp', 'iehist'}
     std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp'}
@@ -87,7 +87,7 @@ def get_selection():
         'path of the directory or filename of a storage media image containing the file.'))
     argument_parser.add_argument('dest', nargs='?', metavar='destination', default=None, help=(
         'destination directory where the output will be stored.'))
-    argument_parser.add_argument('-a', '--artifact', default=None, help=(
+    argument_parser.add_argument('-a', '--artifact', default='std', help=(
         'artifacts to extract. See above for list of supported artifacts.'))
 
     options = argument_parser.parse_args()
@@ -98,10 +98,7 @@ def get_selection():
         print('')
         return False
 
-    if not options.artifact:
-        options.artifact = 'std'
-    options.artifact = parse_selection(options.artifact)
-
+    options.artifact = _parse_selection(options.artifact)
     if options.artifact is None:
         return False
     else:
