@@ -32,6 +32,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
     @staticmethod
     def _preserve_timestamps(file_entry, output_path):
+        """Obtains and sets (to preserve) original timestamps of exported files."""
+
         accessed = created = modified = dt.now()
         stat_object = file_entry.GetStat()
 
@@ -59,7 +61,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
         CloseHandle(handle)
 
     def _check_unique(self, file_entry, md5):
-        """ Checks if file of the same hash has been previously extracted"""
+        """Checks if file of the same hash has been previously extracted."""
 
         if file_entry.path_spec.location in self._extracted:
             if md5 in self._extracted[file_entry.path_spec.location]:
@@ -71,21 +73,28 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             self._extracted[file_entry.path_spec.location] = [md5]
             return True
 
-    def export_file(self, file_entry, output_path, recursive=False):
-        """ Outputs a path specification to the specified path"""
+    def export_file(self, file_entry, output_path, recursive=False, string_to_match=None):
+        """Exports file to specified output path."""
 
         md5_obj = hashlib.md5()
         if file_entry.IsDirectory():
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            for sub_file_entry in file_entry.sub_file_entries:
-                if recursive and sub_file_entry.IsDirectory():
-                    self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name), True)
-                elif not sub_file_entry.IsDirectory():
-                    self.export_file(sub_file_entry, os.path.join(output_path, sub_file_entry.name))
+            for sub_file in file_entry.sub_file_entries:
+                if recursive and sub_file.IsDirectory():
+                    self.export_file(sub_file, os.path.join(output_path, sub_file.name), True, string_to_match)
+                elif not sub_file.IsDirectory():
+                    self.export_file(sub_file, os.path.join(output_path, sub_file.name), False, string_to_match)
         elif file_entry.IsFile():
             if not os.path.exists(os.path.dirname(output_path)):
                 os.makedirs(os.path.dirname(output_path))
+
+            if string_to_match is not None and string_to_match not in file_entry.name:
+                return
+            stat_object = file_entry.GetStat()
+            if stat_object.size <= 0 and file_entry.path_spec.data_stream is None:  # empty file
+                logging.info(u"Empty File:\t{}".format(file_entry.path_spec.location))
+                return
 
             try:
                 in_file = file_entry.GetFileObject()
@@ -114,6 +123,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
     @staticmethod
     def _get_file_entry(base_path_spec, artifact_location, data_stream=None):
+        """Gets file_entry object of specified path specification."""
+
         path_spec = base_path_spec
         path_spec.location = artifact_location
         path_spec.data_stream = data_stream
@@ -173,6 +184,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 print("Processing " + base_path_spec.parent.type_indicator + '...')
 
+            # artifacts.SYSTEM_FILE, artifacts.SYSTEM_DIR, artifacts.FILE_ADS
             output_part_dir = os.path.join(output_base_dir, partition)
             for artifact in itertools.chain(artifacts.SYSTEM_FILE, artifacts.SYSTEM_DIR, artifacts.FILE_ADS):
                 if artifact[0] not in selection:
@@ -189,14 +201,15 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     if file_entry.IsFile():  # artifacts.SYSTEM_FILE
                         self.export_file(file_entry, os.path.join(output_path, vsc_dir, artifact[1].split('/')[-1]))
                     elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
-                        self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[3])
+                        self.export_file(file_entry, os.path.join(output_path, vsc_dir), artifact[3], artifact[4])
                 else:
                     if file_entry.IsFile():  # artifacts.SYSTEM_FILE
                         output_path = os.path.join(output_path, artifact[1].split('/')[-1])
                         self.export_file(file_entry, output_path)
                     elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
-                        self.export_file(file_entry, output_path, artifact[3])
+                        self.export_file(file_entry, output_path, artifact[3], artifact[4])
 
+            # artifacts.USER_FILE, artifacts.USER_DIR
             if any(x in ['lnk_xp', 'iehist_xp', 'usrclass_xp'] for x in selection):
                 users_file_entry = self._get_file_entry(base_path_spec, '/Documents and Settings', None)
             else:
@@ -247,6 +260,7 @@ def main():
     Returns:
         A boolean containing True if successful or False if not.
     """
+
     options = artifact_selector.get_selection()
     if not options:
         return False

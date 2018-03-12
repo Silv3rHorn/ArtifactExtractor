@@ -4,12 +4,7 @@ LOC_WINEVTX = u'/Windows/System32/winevt/logs/'
 LOC_AMCACHE = u'/Windows/AppCompat/Programs/'
 LOC_RECENT = u'/AppData/Roaming/Microsoft/Windows/Recent/'
 
-SYSTEM_FILE = [  # [artifact_path, destination_directory]
-    ['reg', LOC_REG + u'SAM', u'/Registry/'],
-    ['reg', LOC_REG + u'SECURITY', u'/Registry/'],
-    ['reg', LOC_REG + u'SOFTWARE', u'/Registry/'],
-    ['reg', LOC_REG + u'SYSTEM', u'/Registry/'],
-
+SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     ['regb', LOC_REG + u'RegBack/SAM', u'/Registry/RegBack/'],
     ['regb', LOC_REG + u'RegBack/SECURITY', u'/Registry/RegBack/'],
     ['regb', LOC_REG + u'RegBack/SOFTWARE', u'/Registry/RegBack/'],
@@ -35,7 +30,6 @@ SYSTEM_FILE = [  # [artifact_path, destination_directory]
     ['evtl_xp', LOC_WINEVT + u'SecEvent.evt', u'/OSLogs/'],
     ['evtl_xp', LOC_WINEVT + u'SysEvent.evt', u'/OSLogs/'],
 
-    ['amcache', LOC_AMCACHE + u'Amcache.hve', u'/MRU/Prog/'],
     ['amcache', LOC_AMCACHE + u'RecentFileCache.bcf', u'/MRU/Prog/'],
 
     ['setupapi', u'/Windows/Inf/setupapi.dev.log', u'/Registry/'],
@@ -45,21 +39,28 @@ SYSTEM_FILE = [  # [artifact_path, destination_directory]
     ['logfile', u'/$LogFile', u'/Filesystem/']
 ]
 
-SYSTEM_DIR = [  # [artifact_path, destination_directory, isRecursive]
-    ['recycle', u'/$Recycle.Bin', u'/Recycle/', True],
-    ['recycle_xp', u'/RECYCLER', u'/Recycle/', True],
-    ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False],
-    ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False],
-    ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False]
+SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
+    ['reg', LOC_REG[:-1], u'/Registry/', False, u'SAM'],
+    ['reg', LOC_REG[:-1], u'/Registry/', False, u'SECURITY'],
+    ['reg', LOC_REG[:-1], u'/Registry/', False, u'SOFTWARE'],
+    ['reg', LOC_REG[:-1], u'/Registry/', False, u'SYSTEM'],
+
+    ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/', False, u'Amcache'],
+    ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False, u'.pf'],
+    ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
+    ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
+
+    ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
+    ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None]
 ]
 
-USER_FILE = [  # [artifact_path, destination_directory]
+USER_FILE = [  # [artifact, src_path, dest_dir]
     ['ntuser', u'/NTUSER.DAT', u'/Registry/'],
     ['usrclass', u'/AppData/Local/Microsoft/Windows/UsrClass.dat', u'/Registry/'],
     ['usrclass_xp', u'/Local Settings/Application Data/Microsoft/Windows/UsrClass.dat', u'/Registry/']
 ]
 
-USER_DIR = [  # [artifact_path, destination_directory, isRecursive]
+USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive]
     ['lnk', LOC_RECENT, u'MRU/Files/lnk/', False],
     ['lnk_xp', u'/Recent/', u'MRU/Files/lnk/', False],
     ['jmp', LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/', False],
@@ -68,6 +69,6 @@ USER_DIR = [  # [artifact_path, destination_directory, isRecursive]
     ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True]
 ]
 
-FILE_ADS = [  # [artifact_path, destination_directory, ADS Name]
+FILE_ADS = [  # [artifact, src_path, dest_dir, ads_name]
     ['usnjrnl', u'/$Extend/$UsnJrnl', u'/Filesystem/', u'$J']
 ]
