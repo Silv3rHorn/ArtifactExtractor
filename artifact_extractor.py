@@ -81,9 +81,6 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             output_path = output_path[:251] + output_path[-4:]
 
         if file_entry.IsDirectory():
-            if not os.path.exists(os.path.dirname(output_path)):
-                os.makedirs(os.path.dirname(output_path))
-
             for sub_file in file_entry.sub_file_entries:
                 if recursive and sub_file.IsDirectory():
                     self.export_file(sub_file, os.path.join(output_path, sub_file.name), True, string_to_match)
