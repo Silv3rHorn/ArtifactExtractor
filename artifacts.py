@@ -12,8 +12,8 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
 
     ['regb_xp', LOC_REG + u'Repair/SAM', u'/Registry/Repair/'],
     ['regb_xp', LOC_REG + u'Repair/SECURITY', u'/Registry/Repair/'],
-    ['regb_xp', LOC_REG + u'Repair/SOFTWARE', u'/Registry/Repair/'],
-    ['regb_xp', LOC_REG + u'Repair/SYSTEM', u'/Registry/Repair/'],
+    ['regb_xp', LOC_REG + u'Repair/software', u'/Registry/Repair/'],
+    ['regb_xp', LOC_REG + u'Repair/system', u'/Registry/Repair/'],
 
     ['evtl', LOC_WINEVTX + u'Application.evtx', u'/OSLogs/'],
     ['evtl', LOC_WINEVTX + u'Security.evtx', u'/OSLogs/'],
@@ -55,18 +55,20 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
-    ['ntuser', u'/NTUSER.DAT', u'/Registry/'],
-    ['usrclass', u'/AppData/Local/Microsoft/Windows/UsrClass.dat', u'/Registry/'],
-    ['usrclass_xp', u'/Local Settings/Application Data/Microsoft/Windows/UsrClass.dat', u'/Registry/']
+
 ]
 
-USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive]
-    ['lnk', LOC_RECENT, u'MRU/Files/lnk/', False],
-    ['lnk_xp', u'/Recent/', u'MRU/Files/lnk/', False],
-    ['jmp', LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/', False],
-    ['jmp', LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/', False],
-    ['iehist', u'/AppData/Local/Microsoft/Windows/WebCache', u'/MRU/Files/iehist/', False],
-    ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True]
+USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
+    ['ntuser', u'/', u'/Registry/', False, u'NTUSER'],
+    ['usrclass', u'/AppData/Local/Microsoft/Windows/', u'/Registry/', False, u'UsrClass'],
+    ['usrclass_xp', u'/Local Settings/Application Data/Microsoft/Windows/', u'/Registry/', False, u'UsrClass'],
+
+    ['lnk', LOC_RECENT, u'MRU/Files/lnk/', False, None],
+    ['lnk_xp', u'/Recent/', u'MRU/Files/lnk/', False, None],
+    ['jmp', LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/', False, None],
+    ['jmp', LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/', False, None],
+    ['iehist', u'/AppData/Local/Microsoft/Windows/WebCache', u'/MRU/Files/iehist/', False, None],
+    ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True, None]
 ]
 
 FILE_ADS = [  # [artifact, src_path, dest_dir, ads_name]
