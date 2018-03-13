@@ -89,6 +89,7 @@ def get_selection():
         'destination directory where the output will be stored.'))
     argument_parser.add_argument('-a', '--artifact', default='std', help=(
         'artifacts to extract. See above for list of supported artifacts.'))
+    argument_parser.add_argument('--pp', action='store_true')  # pp = preserve path
 
     options = argument_parser.parse_args()
 
