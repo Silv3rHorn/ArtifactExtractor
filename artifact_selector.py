@@ -1,4 +1,5 @@
 import argparse
+import os.path
 
 from argparse import RawTextHelpFormatter
 
@@ -92,6 +93,8 @@ def get_selection():
     argument_parser.add_argument('--pp', action='store_true')  # pp = preserve path
 
     options = argument_parser.parse_args()
+    options.source = os.path.abspath(options.source)
+    options.dest = os.path.abspath(options.dest)
 
     if not options.source or not options.dest:
         print('One or more arguments is missing.\n')
