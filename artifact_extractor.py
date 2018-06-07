@@ -21,6 +21,7 @@ from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
 from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
 
 LOG_FILE = ''
+IS_OLD = False
 
 
 class ArtifactExtractor(volume_scanner.VolumeScanner):
@@ -128,6 +129,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
     @staticmethod
     def _get_file_entry(base_path_spec, artifact_location, data_stream=None):
         """Get file_entry object of specified path specification."""
+        if IS_OLD and 'Windows.old' not in artifact_location:
+            artifact_location = os.path.join('Windows.old' + artifact_location)
 
         path_spec = base_path_spec
         path_spec.location = artifact_location
@@ -154,6 +157,9 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             if file_entry.IsFile():
                 filename = artifact[1].split('/')[-1]
 
+        if not pp and IS_OLD and file_entry.IsFile():
+            elements.insert(-1, 'Windows.old')
+
         for element in elements:
             output_path = os.path.join(output_path, element)
 
@@ -168,6 +174,9 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
         if file_entry.IsFile():
             output_path = os.path.join(output_path, filename)
+
+        if not pp and IS_OLD and file_entry.IsDirectory():
+            output_path = os.path.join(output_path, 'Windows.old')
 
         return output_path
 
@@ -196,7 +205,6 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     if hasattr(base_path_spec.parent.parent, 'location'):
                         partition = base_path_spec.parent.parent.location[1:]
                 else:
-                    self._extracted = {}
                     partition = base_path_spec.parent.location[1:]
                 logging.info('=' * 10 + " Extracting: " + base_path_spec.parent.location[1:] + ' ' + '=' * 10)
             except AttributeError:  # base_path_spec has no 'location' attribute
@@ -207,6 +215,9 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             if partition_type == 'VSHADOW':
                 print("Processing " + partition_type + ' (' + self._get_vsc_ctime(base_path_spec) + ')...')
                 vsc_dir = self._get_vsc_ctime(base_path_spec).replace(':', '').replace(' ', '@')
+            elif IS_OLD:
+                logging.info('=' * 10 + " Extracting: Windows.old " + '=' * 10)
+                print("Processing Windows.old...")
             else:
                 print("Processing " + partition_type + '...')
 
@@ -234,7 +245,10 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 users_file_entry = self._get_file_entry(base_path_spec, '/Users', None)
             if users_file_entry is None:
-                continue
+                if IS_OLD:
+                    break  # stop processing VSCs
+                else:
+                    continue
             for user_file_entry in users_file_entry.sub_file_entries:
                 if not user_file_entry.IsDirectory():
                     continue
@@ -260,12 +274,16 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     elif file_entry.IsDirectory():
                         self.export_file(file_entry, output_path, artifact[3], artifact[4])
 
+            if IS_OLD:  # stop processing VSCs
+                break
+
 
 def main():
     """ The main program function.
     Returns:
         A boolean containing True if successful or False if not.
     """
+    start_time = dt.now()
 
     options = artifact_selector.get_selection()
     if not options:
@@ -281,23 +299,33 @@ def main():
     mediator = vsm.VolumeScannerMediator()
     artifact_extractor = ArtifactExtractor(mediator=mediator)
 
+    global IS_OLD
     try:
         base_path_specs = artifact_extractor.GetBasePathSpecs(options.source)
         if not base_path_specs:
             print('No supported file system found in source.\n')
+            logging.error('No supported file system found in source.')
             return False
 
         if os.path.exists(options.dest):
             print('')
             artifact_extractor.extract_artifacts(base_path_specs, options.dest, options.artifact, options.pp)
+            if options.old:
+                IS_OLD = True
+                artifact_extractor.extract_artifacts(base_path_specs, options.dest, options.artifact, options.pp)
+                IS_OLD = False
         else:
             print('Cannot find destination directory.\n')
+            logging.error('Cannot find destination directory')
             return False
     except KeyboardInterrupt:
         print('\nAborted by user.')
         return False
 
     print('\nCompleted.')
+    print("\rTime Taken: {}".format(dt.now() - start_time))
+    logging.info("Time Taken: {}".format(dt.now() - start_time))
+
     return True
 
 
