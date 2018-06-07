@@ -4,15 +4,19 @@ import os.path
 from argparse import RawTextHelpFormatter
 
 
-def _parse_selection(artifacts):
+def _parse_selection(options):
+    selection_raw = options.artifact
+    global SYSTEM_DIR
+    global SYSTEM_FILE
+
     std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'evtl', 'setupapi', 'prefetch', 'amcache', 'srum', 'sccm', 'lnk',
-             'jmp', 'iehist'}
+             'jmp', 'iehist', 'pshist', 'timeline'}
     std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp'}
     all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile'}
     all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile'}
     supported = all_7 | all_xp | {'std', 'std_xp', 'all', 'all_xp'}
 
-    selection = artifacts.split(',')
+    selection = selection_raw.split(',')
     selection = set(selection)
 
     # remove unsupported artifacts
@@ -48,7 +52,8 @@ def get_selection():
         'It utilises various libraries and example code written by Joachim Metz.\n\n'
 
         'Supported Artifacts: \n'
-        '\t std \t\t reg, regb, ntuser, usrclass, evtl, setupapi, prefetch, amcache, srum, sccm, lnk, jmp, iehist\n'
+        '\t std \t\t reg, regb, ntuser, usrclass, evtl, setupapi, prefetch, amcache, srum, sccm, lnk, jmp, iehist, '
+        'pshist, timeline\n'
         '\t std_xp \t reg, regb_xp, ntuser, usrclass_xp, evtl_xp, setupapi_xp, prefetch, lnk_xp, iehist_xp\n'
         '\t all \t\t all (Windows 7+) - WARNING: SLOW!\n'
         '\t all_xp \t all (Windows XP) - WARNING: SLOW!\n'
@@ -71,10 +76,13 @@ def get_selection():
         '\t jmp \t\t users\' jmp lists\n'
         '\t iehist \t users\' ie history (Windows 7+)\n'
         '\t iehist_xp \t users\' ie history (Windows XP)\n'
+        '\t pshist \t powershell command history\n'
+        '\t timeline \t timeline activity history\n'
         '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
         '\t mft \t\t ntfs mft\n'
         '\t usnjrnl \t ntfs usnjurnl - WARNING: SLOW!\n'
+        
         '\t logfile \t ntfs logfile\n\n'
 
         'Usage: \n'
@@ -90,7 +98,8 @@ def get_selection():
         'destination directory where the output will be stored.'))
     argument_parser.add_argument('-a', '--artifact', default='std', help=(
         'artifacts to extract. See above for list of supported artifacts.'))
-    argument_parser.add_argument('--pp', action='store_true')  # pp = preserve path
+    argument_parser.add_argument('--pp', action='store_true', help='Preserve path of extracted artifacts in output.')
+    argument_parser.add_argument('--old', action='store_true', help='Extract from Windows.old directory as well.')
 
     options = argument_parser.parse_args()
     options.source = os.path.abspath(options.source)
@@ -102,7 +111,7 @@ def get_selection():
         print('')
         return False
 
-    options.artifact = _parse_selection(options.artifact)
+    options.artifact = _parse_selection(options)
     if options.artifact is None:
         return False
     else:

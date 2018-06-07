@@ -15,17 +15,6 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     ['regb_xp', LOC_REG + u'Repair/software', u'/Registry/Repair/'],
     ['regb_xp', LOC_REG + u'Repair/system', u'/Registry/Repair/'],
 
-    ['evtl', LOC_WINEVTX + u'Application.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Security.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Setup.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'System.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-DriverFrameworks-UserMode%4Operational.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-PowerShell%4Operational.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-TaskScheduler%4Operational.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-TerminalServices-LocalSessionManager%4Operational.evtx', u'/OSLogs/'],
-    ['evtl', LOC_WINEVTX + u'Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx', u'/OSLogs/'],
-
     ['evtl_xp', LOC_WINEVT + u'AppEvent.evt', u'/OSLogs/'],
     ['evtl_xp', LOC_WINEVT + u'SecEvent.evt', u'/OSLogs/'],
     ['evtl_xp', LOC_WINEVT + u'SysEvent.evt', u'/OSLogs/'],
@@ -45,6 +34,8 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['reg', LOC_REG[:-1], u'/Registry/', False, u'SOFTWARE'],
     ['reg', LOC_REG[:-1], u'/Registry/', False, u'SYSTEM'],
 
+    ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/', False, None],
+
     ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/', False, u'Amcache'],
     ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False, u'.pf'],
     ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
@@ -55,7 +46,7 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
-
+    ['pshist', u'/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt', u'/OSLogs/']
 ]
 
 USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
@@ -68,7 +59,8 @@ USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['jmp', LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/', False, None],
     ['jmp', LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/', False, None],
     ['iehist', u'/AppData/Local/Microsoft/Windows/WebCache', u'/MRU/Files/iehist/', False, None],
-    ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True, None]
+    ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True, None],
+    ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/Timeline/', True, None]
 ]
 
 FILE_ADS = [  # [artifact, src_path, dest_dir, ads_name]
