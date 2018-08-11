@@ -14,7 +14,7 @@ Else, install from [requirements](https://github.com/Silv3rHorn/ArtifactExtracto
 ## Usage
 1. Download latest release from [Releases](https://github.com/Silv3rHorn/ArtifactExtractor/releases)
 2. Create destination directory
-3. `artifact_extractor.exe <source image> <dest dir> [-a <selected artifacts>]`
+3. `artifact_extractor.exe <source image> <dest dir> [-a <selected artifacts>]` or `artifact_extractor.exe -h` for more options
 
 ## Credits
 Joachim Metz and his libraries
