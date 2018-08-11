@@ -291,10 +291,12 @@ def main():
 
     date_timestamp = dt.now()
     global LOG_FILE
-    LOG_FILE = os.path.join(options.dest, "_logfile.{}.txt".format(date_timestamp.strftime("%Y-%m-%d@%H%M%S")))
+    LOG_FILE = os.path.join(options.dest, "_aExtractor.{}.txt".format(date_timestamp.strftime("%Y-%m-%d@%H%M%S")))
     logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=u'[%(levelname)s] %(message)s')
-    logging.info(u"{0}:\t{1}".format('source', options.source))
-    logging.info(u"{0}:\t{1}".format('dest', options.dest))
+
+    for arg in dir(options):
+        if not arg.startswith('__') and not callable(getattr(options, arg)):
+            logging.info(u"{0}:\t{1}".format(arg, getattr(options, arg)))
 
     mediator = vsm.VolumeScannerMediator()
     artifact_extractor = ArtifactExtractor(mediator=mediator)
