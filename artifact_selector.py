@@ -12,8 +12,8 @@ def _parse_selection(options):
     std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'evtl', 'setupapi', 'prefetch', 'amcache', 'srum', 'sccm', 'lnk',
              'jmp', 'iehist', 'pshist', 'timeline'}
     std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp'}
-    all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile'}
-    all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile'}
+    all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
+    all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
     supported = all_7 | all_xp | {'std', 'std_xp', 'all', 'all_xp'}
 
     selection = selection_raw.split(',')
@@ -82,8 +82,8 @@ def get_selection():
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
         '\t mft \t\t ntfs mft\n'
         '\t usnjrnl \t ntfs usnjurnl - WARNING: SLOW!\n'
-        
-        '\t logfile \t ntfs logfile\n\n'
+        '\t logfile \t ntfs logfile\n'
+        '\t pagefile \t pagefile\n\n'
 
         'Usage: \n'
         '\t Extract essential (in developer\'s opinion) artifacts\n'

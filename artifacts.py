@@ -19,13 +19,14 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     ['evtl_xp', LOC_WINEVT + u'SecEvent.evt', u'/OSLogs/'],
     ['evtl_xp', LOC_WINEVT + u'SysEvent.evt', u'/OSLogs/'],
 
-    ['amcache', LOC_AMCACHE + u'RecentFileCache.bcf', u'/MRU/Prog/'],
+    ['amcache', LOC_AMCACHE + u'RecentFileCache.bcf', u'/MRU/Prog/recentfilecache/'],
 
     ['setupapi', u'/Windows/Inf/setupapi.dev.log', u'/Registry/'],
     ['setupapi_xp', u'/Windows/setupapi.log', u'/Registry/'],
 
     ['mft', u'/$MFT', u'/Filesystem/'],
-    ['logfile', u'/$LogFile', u'/Filesystem/']
+    ['logfile', u'/$LogFile', u'/Filesystem/'],
+    ['pagefile', u'/pagefile.sys', u'/Memory/pagefile/']
 ]
 
 SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
@@ -36,7 +37,7 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 
     ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/', False, None],
 
-    ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/', False, u'Amcache'],
+    ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/amcache/', False, u'Amcache'],
     ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False, u'.pf'],
     ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
     ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
@@ -46,7 +47,7 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
-    ['pshist', u'/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt', u'/OSLogs/']
+    ['pshist', u'/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt', u'/OSLogs/pshist/']
 ]
 
 USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
