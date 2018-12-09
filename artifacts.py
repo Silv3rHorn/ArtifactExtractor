@@ -41,6 +41,9 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False, u'.pf'],
     ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
     ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
+    ['syscache', u'/System Volume Information', u'/MRU/Prog/syscache/', False, u'Syscache'],
+
+    ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/', False, u'StartupInfo'],
 
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
     ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None]
