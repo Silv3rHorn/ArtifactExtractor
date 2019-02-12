@@ -16,9 +16,12 @@ import vsm
 from datetime import datetime as dt
 from dfvfs.helpers import volume_scanner
 from dfvfs.resolver import resolver
-from win32file import SetFileTime, CreateFileW, CloseHandle
-from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
-from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
+
+WINDOWS_IDENTIFIER = 'nt'
+if os.name == WINDOWS_IDENTIFIER:
+    from win32file import SetFileTime, CreateFileW, CloseHandle
+    from win32file import GENERIC_WRITE, FILE_SHARE_WRITE
+    from win32file import OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL
 
 LOG_FILE = ''
 IS_OLD = False
@@ -34,31 +37,34 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
     def _preserve_timestamps(file_entry, output_path):
         """Obtain and set (to preserve) original timestamps of exported files."""
 
-        accessed = created = modified = dt.now()
         stat_object = file_entry.GetStat()
+        if os.name == WINDOWS_IDENTIFIER:
+            accessed = created = modified = dt.now()
 
-        if stat_object.atime:
-            if stat_object.atime_nano:
-                accessed = dt.fromtimestamp((float(str(stat_object.atime) + '.' + str(stat_object.atime_nano))))
-            else:
-                accessed = dt.fromtimestamp(stat_object.atime)
+            if stat_object.atime:
+                if stat_object.atime_nano:
+                    accessed = dt.fromtimestamp((float(str(stat_object.atime) + '.' + str(stat_object.atime_nano))))
+                else:
+                    accessed = dt.fromtimestamp(stat_object.atime)
 
-        if stat_object.crtime:
-            if stat_object.crtime_nano:
-                created = dt.fromtimestamp((float(str(stat_object.crtime) + '.' + str(stat_object.crtime_nano))))
-            else:
-                created = dt.fromtimestamp(stat_object.crtime)
+            if stat_object.crtime:
+                if stat_object.crtime_nano:
+                    created = dt.fromtimestamp((float(str(stat_object.crtime) + '.' + str(stat_object.crtime_nano))))
+                else:
+                    created = dt.fromtimestamp(stat_object.crtime)
 
-        if stat_object.mtime:
-            if stat_object.mtime_nano:
-                modified = dt.fromtimestamp((float(str(stat_object.mtime) + '.' + str(stat_object.mtime_nano))))
-            else:
-                modified = dt.fromtimestamp(stat_object.mtime)
+            if stat_object.mtime:
+                if stat_object.mtime_nano:
+                    modified = dt.fromtimestamp((float(str(stat_object.mtime) + '.' + str(stat_object.mtime_nano))))
+                else:
+                    modified = dt.fromtimestamp(stat_object.mtime)
 
-        handle = CreateFileW(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-                             None)
-        SetFileTime(handle, created, accessed, modified)  # does not seem to preserve nano precision of timestamps
-        CloseHandle(handle)
+            handle = CreateFileW(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+                                 None)
+            SetFileTime(handle, created, accessed, modified)  # does not seem to preserve nano precision of timestamps
+            CloseHandle(handle)
+        else:
+            os.utime(output_path, (stat_object.atime, stat_object.mtime))
 
     def _check_unique(self, file_entry, md5):
         """Check if file of the same hash has been previously extracted."""
@@ -293,6 +299,9 @@ def main():
     global LOG_FILE
     LOG_FILE = os.path.join(options.dest, "_aExtractor.{}.txt".format(date_timestamp.strftime("%Y-%m-%d@%H%M%S")))
     logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=u'[%(levelname)s] %(message)s')
+
+    if not os.name == WINDOWS_IDENTIFIER:
+        logging.warning('Script running on non-Windows host: created times of extracted artefacts will not be preserved.')
 
     for arg in dir(options):
         if not arg.startswith('__') and not callable(getattr(options, arg)):
