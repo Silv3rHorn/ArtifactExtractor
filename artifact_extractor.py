@@ -59,8 +59,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 else:
                     modified = dt.fromtimestamp(stat_object.mtime)
 
-            handle = CreateFileW(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-                                 None)
+            handle = CreateFileW(output_path, GENERIC_WRITE, FILE_SHARE_WRITE, None, OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL, None)
             SetFileTime(handle, created, accessed, modified)  # does not seem to preserve nano precision of timestamps
             CloseHandle(handle)
         else:
@@ -301,7 +301,7 @@ def main():
     logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=u'[%(levelname)s] %(message)s')
 
     if not os.name == WINDOWS_IDENTIFIER:
-        logging.warning('Script running on non-Windows host: created times of extracted artefacts will not be preserved.')
+        logging.warning('Script running on non-Windows host: Timestamps of extracted artefacts will not be preserved.')
 
     for arg in dir(options):
         if not arg.startswith('__') and not callable(getattr(options, arg)):
