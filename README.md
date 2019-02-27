@@ -1,4 +1,6 @@
 # ArtifactExtractor
+![](https://img.shields.io/badge/python-2.7-blue.svg)
+
 ArtifactExtractor is a script that extracts common Windows artifacts from source images and VSCs.
 
 Artifacts in VSCs will be checked (via hash) if they are different from a later VSC/image copy before extraction.
