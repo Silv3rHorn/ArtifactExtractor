@@ -1,5 +1,6 @@
 construct
 dfdatetime
+libfsapfs-python
 libbde-python
 libfsntfs-python
 libfvde-python
@@ -14,9 +15,8 @@ libvshadow-python
 libvslvm-python
 pycrypto
 pytsk3
-six
-dfvfs
-backports.lzma
-libfsapfs-python
 pyyaml
+pywin32
+six
 dtfabric
+dfvfs
