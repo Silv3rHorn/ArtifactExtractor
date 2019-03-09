@@ -88,20 +88,18 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             output_path = output_path[:251] + output_path[-4:]
 
         if file_entry.IsDirectory():
-            if not os.path.exists(output_path):
-                os.makedirs(output_path)
-
             for sub_file in file_entry.sub_file_entries:
                 if recursive and sub_file.IsDirectory():
                     self.export_file(sub_file, os.path.join(output_path, sub_file.name), True, string_to_match)
                 elif not sub_file.IsDirectory():
                     self.export_file(sub_file, os.path.join(output_path, sub_file.name), False, string_to_match)
         elif file_entry.IsFile():
+            if string_to_match is not None and string_to_match.lower() not in file_entry.name.lower():
+                return
+
             if not os.path.exists(os.path.dirname(output_path)):
                 os.makedirs(os.path.dirname(output_path))
 
-            if string_to_match is not None and string_to_match.lower() not in file_entry.name.lower():
-                return
             stat_object = file_entry.GetStat()
             if stat_object.size <= 0 and file_entry.path_spec.data_stream is None:  # empty file
                 logging.info(u"Empty File:\t{}".format(file_entry.path_spec.location))
@@ -149,8 +147,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             return None
 
     @staticmethod
-    def _get_output_path(pp, partition_type, file_entry, artifact, output_part_dir, vsc_dir, username=''):
-        output_path = output_part_dir
+    def _get_output_path(pp, partition_type, file_entry, artifact, output_base_dir, vsc_dir, username=''):
+        output_path = output_base_dir
         filename = ''
 
         if pp:  # preserve path
@@ -191,7 +189,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
         return vsm.VSS_CREATION_TIMESTAMPS[base_path_spec.parent.store_index + 1]
 
     def extract_artifacts(self, base_path_specs, output_base_dir, selection, pp):  # pp = preserve path
-        # Move non-vsc to front of list to be processed first
+        # move non-vsc to front of list to be processed first
         for base_path_spec in base_path_specs:
             if base_path_spec.parent.type_indicator != 'VSHADOW':
                 base_path_specs.insert(0, base_path_specs.pop(base_path_specs.index(base_path_spec)))
@@ -203,9 +201,14 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 logging.warning(u'Unable to open base path specification:\n{0:s}'.format(base_path_spec.comparable))
                 continue
 
-            # get partition of base path spec
+            # get partition type
             partition = 'p1'  # default value
             partition_type = base_path_spec.parent.type_indicator
+
+            if IS_OLD and partition_type == 'VSHADOW':
+                continue  # Windows.old directory does not contain VSCs
+
+            # get partition # of base path spec
             try:
                 if partition_type == 'VSHADOW':
                     if hasattr(base_path_spec.parent.parent, 'location'):
@@ -215,7 +218,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 logging.info('=' * 10 + " Extracting: " + base_path_spec.parent.location[1:] + ' ' + '=' * 10)
             except AttributeError:  # base_path_spec has no 'location' attribute
                 logging.info('=' * 10 + " Extracting: " + partition + ' ' + '=' * 10)
-            output_part_dir = os.path.join(output_base_dir, partition)  # output partition directory
+            if pp:  # preserve path
+                output_base_dir = os.path.join(output_base_dir, partition)  # include partition in output dir structure
 
             vsc_dir = ''
             if partition_type == 'VSHADOW':
@@ -239,7 +243,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 if file_entry is None:
                     continue
 
-                output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_part_dir, vsc_dir)
+                output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_base_dir, vsc_dir)
                 if file_entry.IsFile():  # artifacts.SYSTEM_FILE, artifacts.FILE_ADS
                     self.export_file(file_entry, output_path)
                 elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
@@ -251,10 +255,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             else:
                 users_file_entry = self._get_file_entry(base_path_spec, '/Users', None)
             if users_file_entry is None:
-                if IS_OLD:
-                    break  # stop processing VSCs
-                else:
-                    continue
+                continue
             for user_file_entry in users_file_entry.sub_file_entries:
                 if not user_file_entry.IsDirectory():
                     continue
@@ -273,7 +274,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     if file_entry is None:
                         continue
 
-                    output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_part_dir,
+                    output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_base_dir,
                                                         vsc_dir, dir_name)
                     if file_entry.IsFile():
                         self.export_file(file_entry, output_path)
