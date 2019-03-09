@@ -16,7 +16,6 @@ libvslvm-python
 pycrypto
 pytsk3
 pyyaml
-pywin32
 six
 dtfabric
 dfvfs
