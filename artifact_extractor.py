@@ -218,8 +218,10 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 logging.info('=' * 10 + " Extracting: " + base_path_spec.parent.location[1:] + ' ' + '=' * 10)
             except AttributeError:  # base_path_spec has no 'location' attribute
                 logging.info('=' * 10 + " Extracting: " + partition + ' ' + '=' * 10)
-            if pp and partition_type != 'VSHADOW':  # preserve path
+            if pp:  # preserve path
                 output_part_dir = os.path.join(output_base_dir, partition)  # include partition in output dir structure
+            else:
+                output_part_dir = output_base_dir
 
             vsc_dir = ''
             if partition_type == 'VSHADOW':
