@@ -45,6 +45,9 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 
     ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/', False, u'StartupInfo'],
 
+    ['defender', u'/ProgramData/Microsoft/Windows Defender/Support', u'/Virus Scans/', False, u'MPLog'],
+    ['antimalware', u'/ProgramData/Microsoft/Microsoft Antimalware/Support', u'/Virus Scans/', False, u'MPLog'],
+
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
     ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None]
 ]

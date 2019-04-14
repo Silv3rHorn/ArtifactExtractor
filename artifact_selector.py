@@ -10,8 +10,9 @@ def _parse_selection(options):
     selection_raw = options.artifact
 
     std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'evtl', 'setupapi', 'prefetch', 'amcache', 'srum', 'sccm', 'syscache',
-             'lnk', 'jmp', 'iehist', 'startupinfo', 'pshist', 'timeline'}
-    std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp'}
+             'lnk', 'jmp', 'iehist', 'startupinfo', 'pshist', 'timeline', 'defender', 'antimalware'}
+    std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp',
+              'defender', 'antimalware'}
     all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
     all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
     supported = all_7 | all_xp | {'std', 'std_xp', 'all', 'all_xp'}
@@ -86,6 +87,8 @@ def get_selection():
         '\t iehist_xp \t users\' ie history (Windows XP)\n'
         '\t startupinfo \t startupinfo xml files\n'
         '\t pshist \t powershell command history\n'
+        '\t defender \t windows defender mplogs\n'
+        '\t antimalware \t microsoft antimalware mplogs\n'
         '\t timeline \t timeline activity history\n'
         '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
