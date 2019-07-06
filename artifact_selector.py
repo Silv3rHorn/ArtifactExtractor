@@ -9,12 +9,13 @@ from argparse import RawTextHelpFormatter
 def _parse_selection(options):
     selection_raw = options.artifact
 
-    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'evtl', 'setupapi', 'prefetch', 'amcache', 'srum', 'sccm', 'syscache',
-             'lnk', 'jmp', 'iehist', 'startupinfo', 'pshist', 'timeline', 'defender', 'antimalware'}
-    std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'evtl_xp', 'setupapi_xp', 'prefetch', 'lnk_xp', 'iehist_xp',
-              'defender', 'antimalware'}
-    all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
-    all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile', 'pagefile'}
+    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'defender', 'evtl', 'pshist', 'setupapi', 'amcache',
+             'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'srum', 'syscache', 'thumbcache', 'timeline',
+             'wer', 'sch_job', 'sch_xml', 'startupinfo'}
+    std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'antimalware', 'defender', 'evtl_xp', 'setupapi_xp',
+              'iehist_xp', 'lnk_xp', 'prefetch', 'rdpcache_xp', 'sch_job', 'sch_xp'}
+    all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
+    all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
     supported = all_7 | all_xp | {'std', 'std_xp', 'all', 'all_xp'}
 
     selection = selection_raw.split(',')
@@ -60,9 +61,10 @@ def get_selection():
         'It utilises various libraries and example code written by Joachim Metz.\n\n'
 
         'Supported Artifacts: \n'
-        '\t std \t\t reg, regb, ntuser, usrclass, evtl, setupapi, prefetch, amcache, srum, sccm, lnk, jmp, iehist, '
-        'pshist, timeline\n'
-        '\t std_xp \t reg, regb_xp, ntuser, usrclass_xp, evtl_xp, setupapi_xp, prefetch, lnk_xp, iehist_xp\n'
+        '\t std \t\t reg, regb, ntuser, usrclass, antimalware, defender, evtl, pshist, setupapi, amcache, iehist, jmp, '
+        'lnk, prefetch, rdpcache, sccm, srum, syscache, thumbcache, timeline, wer, sch_job, sch_xml, startupinfo\n'
+        '\t std_xp \t reg, regb_xp, ntuser, usrclass_xp, antimalware, defender, evtl_xp, setupapi_xp, iehist_xp, '
+        'lnk_xp, prefetch, rdpcache_xp, sch_job, sch_xp\n'
         '\t all \t\t all (Windows 7+) - WARNING: SLOW!\n'
         '\t all_xp \t all (Windows XP) - WARNING: SLOW!\n'
 
@@ -91,12 +93,19 @@ def get_selection():
         '\t lnk \t\t users\' lnk files (Windows 7+)\n'
         '\t lnk_xp \t users\' lnk files (Windows XP)\n'
         '\t prefetch \t prefetch\n'
-        '\t srum \t\t system resource usage monitor\n'
+        '\t rdpcache \t rdp cache files (Windows 7+)\n'
+        '\t rdpcache_xp \t rdp cache files (Windows XP)\n'
         '\t sccm \t\t system center configuration manager software metering\n'
+        '\t srum \t\t system resource usage monitor\n'
         '\t syscache \t syscache hive (Windows 7)\n'
+        '\t thumbcache \t thumbcache files (Windows 7+)\n'
         '\t timeline \t timeline activity history\n'
+        '\t wer \t\t windows error reporting reports\n'
 
         '\t\t ===== Persistence ======\n'
+        '\t sch_job \t scheduled task job files\n'
+        '\t sch_xml \t scheduled task xml files (Windows 7+)\n'
+        '\t sch_xp \t scheduled task info log (Windows XP)\n'
         '\t startupinfo \t startupinfo xml files\n'
 
         '\t\t ===== File System ======\n'
@@ -108,6 +117,7 @@ def get_selection():
         '\t pagefile \t pagefile - WARNING: SLOW!\n'
         '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
+        '\t sig_ctlg \t users\' signature catalog files\n'
 
         'Usage: \n'
         '\t Extract essential (in developer\'s opinion) artifacts\n'

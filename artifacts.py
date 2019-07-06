@@ -25,6 +25,9 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     # mru
     ['amcache', LOC_AMCACHE + u'RecentFileCache.bcf', u'/MRU/Prog/recentfilecache/'],
 
+    # persistence
+    ['sch_xp', u'/Windows/SchedLgU.txt', u'/Autoruns/sch_tsks/'],
+
     # file system
     ['logfile', u'/$LogFile', u'/Filesystem/'],
     ['mft', u'/$MFT', u'/Filesystem/'],
@@ -51,13 +54,17 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
     ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
     ['syscache', u'/System Volume Information', u'/MRU/Prog/syscache/', False, u'Syscache'],
+    ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/MRU/Prog/wer/', True, None],
 
     # persistence
-    ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/', False, u'StartupInfo'],
+    ['sch_job', u'/Windows/Tasks', u'/Autoruns/sch_tsks/', False, u'.job'],
+    ['sch_xml', u'/Windows/System32/Tasks', u'/Autoruns/sch_tsks/', True, None],
+    ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/startupinfo/', False, u'StartupInfo'],
 
     # others
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
-    ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None]
+    ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None],
+    ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Signatures/', True, None]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
@@ -76,9 +83,13 @@ USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['iehist_xp', u'/Local Settings/History/History.IE5', u'/MRU/Files/iehist/', True, None],
     ['jmp', LOC_RECENT + u'AutomaticDestinations', u'/MRU/Files/jmp/', False, None],
     ['jmp', LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/', False, None],
-    ['lnk', LOC_RECENT, u'MRU/Files/lnk/', False, None],
-    ['lnk_xp', u'/Recent/', u'MRU/Files/lnk/', False, None],
-    ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/Timeline/', True, None]
+    ['lnk', LOC_RECENT, u'MRU/Files/lnk', False, None],
+    ['lnk_xp', u'/Recent/', u'MRU/Files/lnk', False, None],
+    ['rdpcache', u'/AppData/Local/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/', False, None],
+    ['rdpcache_xp', u'/Local Settings/Application Data/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/',
+     False, None],
+    ['thumbcache', u'/AppData/Local/Microsoft/Windows/Explorer', u'/MRU/thumbcache/', False, u'thumbcache_'],
+    ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/timeline/', True, None]
 ]
 
 FILE_ADS = [  # [artifact, src_path, dest_dir, ads_name]
