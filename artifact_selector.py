@@ -65,37 +65,49 @@ def get_selection():
         '\t std_xp \t reg, regb_xp, ntuser, usrclass_xp, evtl_xp, setupapi_xp, prefetch, lnk_xp, iehist_xp\n'
         '\t all \t\t all (Windows 7+) - WARNING: SLOW!\n'
         '\t all_xp \t all (Windows XP) - WARNING: SLOW!\n'
+
+        '\t\t ===== Registry Hives ======\n'
         '\t reg \t\t registry hives\n'
         '\t regb \t\t backup registry hives (Windows 7+)\n'
         '\t regb_xp \t backup registry hives (Windows XP)\n'
         '\t ntuser \t users\' ntuser hive\n'
         '\t usrclass \t users\' usrclass hive (Windows 7+)\n'
-        '\t usrclass_xp \t users\' usrclass (Windows XP)\n'
+        '\t usrclass_xp \t users\' usrclass hive (Windows XP)\n'
+
+        '\t\t ===== System Logs ======\n'
+        '\t antimalware \t microsoft antimalware mplogs\n'
+        '\t defender \t windows defender mplogs\n'
         '\t evtl \t\t event logs (Windows 7+)\n'
         '\t evtl_xp \t event logs (Windows XP)\n'
+        '\t pshist \t powershell command history\n'
         '\t setupapi \t setupapi log (Windows 7+)\n'
         '\t setupapi_xp \t setupapi log (Windows XP)\n'
-        '\t prefetch \t prefetch\n'
+
+        '\t\t ===== Most Recently Used ======\n'
         '\t amcache \t amcache and/or recentfilecache.bcf\n'
+        '\t iehist \t users\' ie history (Windows 7+)\n'
+        '\t iehist_xp \t users\' ie history (Windows XP)\n'
+        '\t jmp \t\t users\' jmp lists\n'
+        '\t lnk \t\t users\' lnk files (Windows 7+)\n'
+        '\t lnk_xp \t users\' lnk files (Windows XP)\n'
+        '\t prefetch \t prefetch\n'
         '\t srum \t\t system resource usage monitor\n'
         '\t sccm \t\t system center configuration manager software metering\n'
         '\t syscache \t syscache hive (Windows 7)\n'
-        '\t lnk \t\t users\' lnk files (Windows 7+)\n'
-        '\t lnk_xp \t users\' lnk files (Windows XP)\n'
-        '\t jmp \t\t users\' jmp lists\n'
-        '\t iehist \t users\' ie history (Windows 7+)\n'
-        '\t iehist_xp \t users\' ie history (Windows XP)\n'
-        '\t startupinfo \t startupinfo xml files\n'
-        '\t pshist \t powershell command history\n'
-        '\t defender \t windows defender mplogs\n'
-        '\t antimalware \t microsoft antimalware mplogs\n'
         '\t timeline \t timeline activity history\n'
-        '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
-        '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
+
+        '\t\t ===== Persistence ======\n'
+        '\t startupinfo \t startupinfo xml files\n'
+
+        '\t\t ===== File System ======\n'
         '\t mft \t\t ntfs mft\n'
         '\t logfile \t ntfs logfile\n'
         '\t usnjrnl \t ntfs usnjurnl - WARNING: SLOW!\n'
-        '\t pagefile \t pagefile - WARNING: SLOW!\n\n'
+
+        '\t\t ===== Others ======\n'
+        '\t pagefile \t pagefile - WARNING: SLOW!\n'
+        '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
+        '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
 
         'Usage: \n'
         '\t Extract essential (in developer\'s opinion) artifacts\n'
@@ -103,10 +115,10 @@ def get_selection():
 
         '\t Extract essential (in developer\'s opinion) artifacts + $MFT\n'
         '\t artifact_extractor <forensic image> <dest> -a std,mft\n\n'
-        
+
         '\t Extract unsupported file\n'
         '\t artifact_extractor <forensic image> <dest> --cf <path to unsupported file e.g. /Windows/hiberfil.sys>]>\n\n'
-        
+
         '\t Extract unsupported directory\n'
         '\t artifact_extractor <forensic image> <dest> --cd <path to unsupported dir e.g. /Windows/Temp>\n\n'
     ), formatter_class=RawTextHelpFormatter)
