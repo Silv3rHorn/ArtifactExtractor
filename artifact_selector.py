@@ -117,7 +117,7 @@ def get_selection():
         '\t pagefile \t pagefile - WARNING: SLOW!\n'
         '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
-        '\t sig_ctlg \t users\' signature catalog files\n'
+        '\t sig_ctlg \t users\' signature catalog files\n\n'
 
         'Usage: \n'
         '\t Extract essential (in developer\'s opinion) artifacts\n'
