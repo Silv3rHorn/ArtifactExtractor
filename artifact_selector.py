@@ -10,8 +10,8 @@ def _parse_selection(options):
     selection_raw = options.artifact
 
     std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'defender', 'evtl', 'pshist', 'setupapi', 'amcache',
-             'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'srum', 'syscache', 'thumbcache', 'timeline',
-             'wer', 'sch_job', 'sch_xml', 'startupinfo'}
+             'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'sqm', 'srum', 'syscache', 'thumbcache', 'timeline',
+             'wer', 'sch_job', 'sch_xml', 'startupinfo', 'ual'}
     std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'antimalware', 'defender', 'evtl_xp', 'setupapi_xp',
               'iehist_xp', 'lnk_xp', 'prefetch', 'rdpcache_xp', 'sch_job', 'sch_xp'}
     all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
@@ -84,6 +84,7 @@ def get_selection():
         '\t pshist \t powershell command history\n'
         '\t setupapi \t setupapi log (Windows 7+)\n'
         '\t setupapi_xp \t setupapi log (Windows XP)\n'
+        '\t ual \t\t user access logs\n'
 
         '\t\t ===== Most Recently Used ======\n'
         '\t amcache \t amcache and/or recentfilecache.bcf\n'
@@ -93,14 +94,12 @@ def get_selection():
         '\t lnk \t\t users\' lnk files (Windows 7+)\n'
         '\t lnk_xp \t users\' lnk files (Windows XP)\n'
         '\t prefetch \t prefetch\n'
-        '\t rdpcache \t rdp cache files (Windows 7+)\n'
-        '\t rdpcache_xp \t rdp cache files (Windows XP)\n'
         '\t sccm \t\t system center configuration manager software metering\n'
         '\t srum \t\t system resource usage monitor\n'
+        '\t sqm \t\t software qauality metrices\n'
         '\t syscache \t syscache hive (Windows 7)\n'
         '\t thumbcache \t thumbcache files (Windows 7+)\n'
         '\t timeline \t timeline activity history\n'
-        '\t wer \t\t windows error reporting reports\n'
 
         '\t\t ===== Persistence ======\n'
         '\t sch_job \t scheduled task job files\n'
@@ -115,8 +114,11 @@ def get_selection():
 
         '\t\t ===== Others ======\n'
         '\t pagefile \t pagefile - WARNING: SLOW!\n'
+        '\t rdpcache \t rdp cache files (Windows 7+)\n'
+        '\t rdpcache_xp \t rdp cache files (Windows XP)\n'
         '\t recycle \t users\' recycle bin files (Windows 7+) - does not provide owner or original file name\n'
         '\t recycle_xp \t users\' recycle bin files (Windows XP) - does not provide owner\n'
+        '\t wer \t\t windows error reporting reports\n'
         '\t sig_ctlg \t users\' signature catalog files\n\n'
 
         'Usage: \n'

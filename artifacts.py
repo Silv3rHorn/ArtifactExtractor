@@ -52,11 +52,10 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     # mru
     ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/amcache/', False, u'Amcache'],
     ['prefetch', u'/Windows/Prefetch', u'/MRU/Prog/prefetch/', False, u'.pf'],
-    ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
     ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
-    ['syscache', u'/System Volume Information', u'/MRU/Prog/syscache/', False, u'Syscache'],
-    ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/MRU/Prog/wer/', True, None],
+    ['srum', u'/Windows/System32/sru', u'/MRU/Prog/srum/', False, None],
     ['sqm', u'/ProgramData/Microsoft/Windows/Sqm/Upload', u'/MRU/Prog/sqm/', False, u'.sqm'],
+    ['syscache', u'/System Volume Information', u'/MRU/Prog/syscache/', False, u'Syscache'],
 
     # persistence
     ['sch_job', u'/Windows/Tasks', u'/Autoruns/sch_tsks/', False, u'.job'],
@@ -66,7 +65,8 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     # others
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
     ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None],
-    ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Signatures/', True, None]
+    ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Signatures/', True, None],
+    ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/MRU/Prog/wer/', True, None]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
@@ -87,11 +87,13 @@ USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['jmp', LOC_RECENT + u'CustomDestinations', u'/MRU/Files/jmp/', False, None],
     ['lnk', LOC_RECENT, u'MRU/Files/lnk', False, None],
     ['lnk_xp', u'/Recent/', u'MRU/Files/lnk', False, None],
+    ['thumbcache', u'/AppData/Local/Microsoft/Windows/Explorer', u'/MRU/thumbcache/', False, u'thumbcache_'],
+    ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/timeline/', True, None],
+
+    # others
     ['rdpcache', u'/AppData/Local/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/', False, None],
     ['rdpcache_xp', u'/Local Settings/Application Data/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/',
-     False, None],
-    ['thumbcache', u'/AppData/Local/Microsoft/Windows/Explorer', u'/MRU/thumbcache/', False, u'thumbcache_'],
-    ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/timeline/', True, None]
+     False, None]
 ]
 
 FILE_ADS = [  # [artifact, src_path, dest_dir, ads_name]
