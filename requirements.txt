@@ -13,7 +13,7 @@ libvhdi-python
 libvmdk-python
 libvshadow-python
 libvslvm-python
-pycrypto
+pycryptodome
 pytsk3
 pyyaml
 six
