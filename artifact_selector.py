@@ -9,9 +9,9 @@ from argparse import RawTextHelpFormatter
 def _parse_selection(options):
     selection_raw = options.artifact
 
-    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'certutil', 'defender', 'evtl', 'pshist', 'setupapi',
-             'amcache', 'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'sqm', 'srum', 'syscache', 'thumbcache',
-             'timeline', 'wer', 'sch_job', 'sch_xml', 'startupinfo', 'ual'}
+    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'certutil', 'defender', 'etl', 'evtl', 'pshist',
+             'setupapi', 'amcache', 'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'sqm', 'srum', 'syscache',
+             'thumbcache', 'timeline', 'wer', 'sch_job', 'sch_xml', 'startupinfo', 'ual'}
     std_xp = {'bits', 'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'antimalware', 'defender', 'evtl_xp', 'setupapi_xp',
               'iehist_xp', 'lnk_xp', 'prefetch', 'rdpcache_xp', 'sch_job', 'sch_xp'}
     all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
@@ -79,6 +79,7 @@ def get_selection():
         '\t\t ===== System Logs ======\n'
         '\t antimalware \t microsoft antimalware mplogs\n'
         '\t defender \t windows defender mplogs\n'
+        '\t etl \t\t event trace logs\n'
         '\t evtl \t\t event logs (Windows 7+)\n'
         '\t evtl_xp \t event logs (Windows XP)\n'
         '\t pshist \t powershell command history\n'

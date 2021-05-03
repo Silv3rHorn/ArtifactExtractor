@@ -28,12 +28,18 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     # persistence
     ['sch_xp', u'/Windows/SchedLgU.txt', u'/Autoruns/sch_tsks/'],
 
+    # etl
+    ['etl', u'/ProgramData/Microsoft/Windows/Power Efficiency Diagnostics/energy-ntkl.etl', u'/Misc/etl/'],
+    ['etl', u'/ProgramData/Microsoft/Windows/Power Efficiency Diagnostics/energy-trace.etl', u'/Misc/etl/'],
+    ['etl', u'/Windows/System32/LogFiles/WMI/LwtNetLog.etl', u'/Misc/etl/'],
+    ['etl', u'/Windows/System32/LogFiles/WMI/Wifi.etl', u'/Misc/etl/'],
+
     # file system
     ['logfile', u'/$LogFile', u'/Filesystem/'],
     ['mft', u'/$MFT', u'/Filesystem/'],
 
     # others
-    ['bits', u'/ProgramData/Microsoft/Network/Downloader.qmgr.dat', u'/Misc/bits/'],
+    ['bits', u'/ProgramData/Microsoft/Network/Downloader/qmgr.dat', u'/Misc/bits/'],
     ['pagefile', u'/pagefile.sys', u'/Memory/pagefile/']
 ]
 
@@ -63,6 +69,9 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['sch_xml', u'/Windows/System32/Tasks', u'/Autoruns/sch_tsks/', True, None],
     ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/startupinfo/', False, u'StartupInfo'],
 
+    # etl
+    ['etl', u'/Windows/System32/WDI/LogFiles', u'/Misc/etl/', False, u'.etl'],
+
     # others
     ['certutil', u'/Windows/System32/config/systemprofile/AppData/LocalLow/Microsoft/CryptnetUrlCache/MetaData',
      u'/Misc/certutil/', False, None],
@@ -73,6 +82,12 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
+    # etl
+    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog.etl', u'/Misc/etl/'],
+    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog_RunOnce.etl', u'/Misc/etl/'],
+    ['etl', u'/AppData/Local/Packages/Microsoft.Windows.Cortana_cw5n1h2txyewy/TempState/Traces/CortanaTrace1.etl',
+     u'/Misc/etl/'],
+
     # system logs
     ['pshist', u'/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt', u'/OSLogs/pshist/']
 ]
