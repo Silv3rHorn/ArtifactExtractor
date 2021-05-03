@@ -46,7 +46,8 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     # system logs
     ['antimalware', u'/ProgramData/Microsoft/Microsoft Antimalware/Support', u'/Virus Scans/', False, u'MPLog'],
     ['defender', u'/ProgramData/Microsoft/Windows Defender/Support', u'/Virus Scans/', False, u'MPLog'],
-    ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/', False, None],
+    ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/evtl', False, None],
+    ['ual', u'/Windows/System32/LogFiles/SUM', u'/OSLogs/ual', False, u'.mdb'],
 
     # mru
     ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/amcache/', False, u'Amcache'],
