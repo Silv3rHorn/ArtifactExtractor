@@ -55,6 +55,7 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['sccm', u'/Windows/System32/wbem/Repository', u'/MRU/Prog/sccm/', False, None],
     ['syscache', u'/System Volume Information', u'/MRU/Prog/syscache/', False, u'Syscache'],
     ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/MRU/Prog/wer/', True, None],
+    ['sqm', u'/ProgramData/Microsoft/Windows/Sqm/Upload', u'/MRU/Prog/sqm/', False, u'.sqm'],
 
     # persistence
     ['sch_job', u'/Windows/Tasks', u'/Autoruns/sch_tsks/', False, u'.job'],
