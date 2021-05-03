@@ -16,9 +16,9 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     ['regb_xp', LOC_REG + u'Repair/system', u'/Registry/Repair/'],
 
     # system logs
-    ['evtl_xp', LOC_WINEVT + u'AppEvent.evt', u'/OSLogs/'],
-    ['evtl_xp', LOC_WINEVT + u'SecEvent.evt', u'/OSLogs/'],
-    ['evtl_xp', LOC_WINEVT + u'SysEvent.evt', u'/OSLogs/'],
+    ['evtl_xp', LOC_WINEVT + u'AppEvent.evt', u'/OSLogs/evtl/'],
+    ['evtl_xp', LOC_WINEVT + u'SecEvent.evt', u'/OSLogs/evtl'],
+    ['evtl_xp', LOC_WINEVT + u'SysEvent.evt', u'/OSLogs/evtl'],
     ['setupapi', u'/Windows/Inf/setupapi.dev.log', u'/Registry/'],
     ['setupapi_xp', u'/Windows/setupapi.log', u'/Registry/'],
 
@@ -65,8 +65,8 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     # others
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
     ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None],
-    ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Signatures/', True, None],
-    ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/MRU/Prog/wer/', True, None]
+    ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Misc/signatures/', True, None],
+    ['wer', u'/ProgramData/Microsoft/Windows/WER', u'/Misc/wer/', True, None]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
@@ -91,8 +91,8 @@ USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/timeline/', True, None],
 
     # others
-    ['rdpcache', u'/AppData/Local/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/', False, None],
-    ['rdpcache_xp', u'/Local Settings/Application Data/Microsoft/Terminal Server Client/Cache', u'/MRU/rdpcache/',
+    ['rdpcache', u'/AppData/Local/Microsoft/Terminal Server Client/Cache', u'/Misc/rdpcache/', False, None],
+    ['rdpcache_xp', u'/Local Settings/Application Data/Microsoft/Terminal Server Client/Cache', u'/Misc/rdpcache/',
      False, None]
 ]
 
