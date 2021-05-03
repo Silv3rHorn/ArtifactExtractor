@@ -64,6 +64,8 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/startupinfo/', False, u'StartupInfo'],
 
     # others
+    ['certutil', u'/Windows/System32/config/systemprofile/AppData/LocalLow/Microsoft/CryptnetUrlCache/MetaData',
+     u'/Misc/certutil/', False, None],
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
     ['recycle_xp', u'/RECYCLER', u'/Recycle/', True, None],
     ['sig_ctlg', u'/Windows/System32/CatRoot', u'/Misc/signatures/', True, None],
