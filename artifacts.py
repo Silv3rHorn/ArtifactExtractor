@@ -33,6 +33,7 @@ SYSTEM_FILE = [  # [artifact, src_path, dest_dir]
     ['mft', u'/$MFT', u'/Filesystem/'],
 
     # others
+    ['bits', u'/ProgramData/Microsoft/Network/Downloader.qmgr.dat', u'/Misc/bits/'],
     ['pagefile', u'/pagefile.sys', u'/Memory/pagefile/']
 ]
 

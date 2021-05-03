@@ -9,10 +9,10 @@ from argparse import RawTextHelpFormatter
 def _parse_selection(options):
     selection_raw = options.artifact
 
-    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'defender', 'evtl', 'pshist', 'setupapi', 'amcache',
-             'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'sqm', 'srum', 'syscache', 'thumbcache', 'timeline',
-             'wer', 'sch_job', 'sch_xml', 'startupinfo', 'ual'}
-    std_xp = {'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'antimalware', 'defender', 'evtl_xp', 'setupapi_xp',
+    std_7 = {'reg', 'regb', 'ntuser', 'usrclass', 'antimalware', 'certutil', 'defender', 'evtl', 'pshist', 'setupapi',
+             'amcache', 'iehist', 'jmp', 'lnk', 'prefetch', 'rdpcache', 'sccm', 'sqm', 'srum', 'syscache', 'thumbcache',
+             'timeline', 'wer', 'sch_job', 'sch_xml', 'startupinfo', 'ual'}
+    std_xp = {'bits', 'reg', 'regb_xp', 'ntuser', 'usrclass_xp', 'antimalware', 'defender', 'evtl_xp', 'setupapi_xp',
               'iehist_xp', 'lnk_xp', 'prefetch', 'rdpcache_xp', 'sch_job', 'sch_xp'}
     all_7 = std_7 | {'recycle', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
     all_xp = std_xp | {'recycle_xp', 'mft', 'usnjrnl', 'logfile', 'pagefile', 'sig_ctlg'}
@@ -113,6 +113,8 @@ def get_selection():
         '\t usnjrnl \t ntfs usnjurnl - WARNING: SLOW!\n'
 
         '\t\t ===== Others ======\n'
+        '\t bits \t\t bits qmgr.dat\n'
+        '\t certutil \t certutil metadata\n'
         '\t pagefile \t pagefile - WARNING: SLOW!\n'
         '\t rdpcache \t rdp cache files (Windows 7+)\n'
         '\t rdpcache_xp \t rdp cache files (Windows XP)\n'
