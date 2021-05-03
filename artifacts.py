@@ -91,6 +91,7 @@ USER_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['timeline', u'/AppData/Local/ConnectedDevicesPlatform', u'/MRU/timeline/', True, None],
 
     # others
+    ['certutil', u'/AppData/LocalLow/Microsoft/CryptnetUrlCache/MetaData', u'/Misc/certutil/', False, None],
     ['rdpcache', u'/AppData/Local/Microsoft/Terminal Server Client/Cache', u'/Misc/rdpcache/', False, None],
     ['rdpcache_xp', u'/Local Settings/Application Data/Microsoft/Terminal Server Client/Cache', u'/Misc/rdpcache/',
      False, None]
