@@ -1,5 +1,5 @@
 construct
-dfdatetime
+dfdatetime == 20190517
 libfsapfs-python
 libbde-python
 libfsntfs-python
@@ -13,9 +13,9 @@ libvhdi-python
 libvmdk-python
 libvshadow-python
 libvslvm-python
-pycryptodome
-pytsk3
+pycrypto
+pytsk3 == 20190507
 pyyaml
 six
-dtfabric
-dfvfs
+dtfabric == 20190120
+dfvfs == 20190902
