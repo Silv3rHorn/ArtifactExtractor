@@ -51,10 +51,9 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['reg', LOC_REG[:-1], u'/Registry/', False, u'SYSTEM'],
 
     # system logs
-    ['antimalware', u'/ProgramData/Microsoft/Microsoft Antimalware/Support', u'/Virus Scans/', False, u'MPLog'],
-    ['defender', u'/ProgramData/Microsoft/Windows Defender/Support', u'/Virus Scans/', False, u'MPLog'],
-    ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/evtl', False, None],
-    ['ual', u'/Windows/System32/LogFiles/SUM', u'/OSLogs/ual', False, u'.mdb'],
+    ['etl', u'/Windows/System32/WDI/LogFiles', u'/OSLogs/etl/', False, u'.etl'],
+    ['evtl', LOC_WINEVTX[:-1], u'/OSLogs/evtl/', False, None],
+    ['ual', u'/Windows/System32/LogFiles/SUM', u'/OSLogs/ual/', False, u'.mdb'],
 
     # mru
     ['amcache', LOC_AMCACHE[:-1], u'/MRU/Prog/amcache/', False, u'Amcache'],
@@ -69,10 +68,9 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
     ['sch_xml', u'/Windows/System32/Tasks', u'/Autoruns/sch_tsks/', True, None],
     ['startupinfo', u'/Windows/System32/wdi/LogFiles/StartupInfo', u'/Autoruns/startupinfo/', False, u'StartupInfo'],
 
-    # etl
-    ['etl', u'/Windows/System32/WDI/LogFiles', u'/Misc/etl/', False, u'.etl'],
-
     # others
+    ['antimalware', u'/ProgramData/Microsoft/Microsoft Antimalware/Support', u'/VirusScans/', False, u'MPLog'],
+    ['defender', u'/ProgramData/Microsoft/Windows Defender/Support', u'/VirusScans/', False, u'MPLog'],
     ['certutil', u'/Windows/System32/config/systemprofile/AppData/LocalLow/Microsoft/CryptnetUrlCache/MetaData',
      u'/Misc/certutil/', False, None],
     ['recycle', u'/$Recycle.Bin', u'/Recycle/', True, None],
@@ -82,13 +80,11 @@ SYSTEM_DIR = [  # [artifact, src_path, dest_dir, isRecursive, stringToMatch]
 ]
 
 USER_FILE = [  # [artifact, src_path, dest_dir]
-    # etl
-    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog.etl', u'/Misc/etl/'],
-    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog_RunOnce.etl', u'/Misc/etl/'],
-    ['etl', u'/AppData/Local/Packages/Microsoft.Windows.Cortana_cw5n1h2txyewy/TempState/Traces/CortanaTrace1.etl',
-     u'/Misc/etl/'],
-
     # system logs
+    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog.etl', u'/OSLogs/etl/'],
+    ['etl', u'/AppData/Local/Microsoft/Windows/Explorer/ExplorerStartupLog_RunOnce.etl', u'/OSLogs/etl/'],
+    ['etl', u'/AppData/Local/Packages/Microsoft.Windows.Cortana_cw5n1h2txyewy/TempState/Traces/CortanaTrace1.etl',
+     u'/OSLogs/etl/'],
     ['pshist', u'/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt', u'/OSLogs/pshist/']
 ]
 
