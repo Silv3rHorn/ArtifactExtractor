@@ -79,7 +79,7 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
             self._extracted[file_entry.path_spec.location] = [md5]
             return True
 
-    def export_file(self, file_entry, output_path, recursive=False, string_to_match=None):
+    def export_file(self, partition_type, file_entry, output_path, recursive=False, string_to_match=None):
         """Export file to specified output path."""
 
         md5_obj = hashlib.md5()
@@ -90,9 +90,11 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
         if file_entry.IsDirectory():
             for sub_file in file_entry.sub_file_entries:
                 if recursive and sub_file.IsDirectory():
-                    self.export_file(sub_file, os.path.join(output_path, sub_file.name), True, string_to_match)
+                    self.export_file(partition_type, sub_file, os.path.join(output_path, sub_file.name), True,
+                                     string_to_match)
                 elif not sub_file.IsDirectory():
-                    self.export_file(sub_file, os.path.join(output_path, sub_file.name), False, string_to_match)
+                    self.export_file(partition_type, sub_file, os.path.join(output_path, sub_file.name), False,
+                                     string_to_match)
         elif file_entry.IsFile():
             if string_to_match is not None and string_to_match.lower() not in file_entry.name.lower():
                 return
@@ -120,7 +122,8 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                 if in_file:
                     in_file.close()
 
-                if not self._check_unique(file_entry, md5_obj.hexdigest()):
+                if (not self._check_unique(file_entry, md5_obj.hexdigest())) and \
+                        (partition_type == 'VSHADOW' or IS_OLD):
                     os.remove(output_path)
                     logging.info(u"Duplicate:\t{}\t{}".format(file_entry.path_spec.location, md5_obj.hexdigest()))
                 else:
@@ -247,9 +250,9 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
 
                 output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_part_dir, vsc_dir)
                 if file_entry.IsFile():  # artifacts.SYSTEM_FILE, artifacts.FILE_ADS
-                    self.export_file(file_entry, output_path)
+                    self.export_file(partition_type, file_entry, output_path)
                 elif file_entry.IsDirectory():  # artifacts.SYSTEM_DIR
-                    self.export_file(file_entry, output_path, artifact[3], artifact[4])
+                    self.export_file(partition_type, file_entry, output_path, artifact[3], artifact[4])
 
             # artifacts.USER_FILE, artifacts.USER_DIR
             if any(x in ['lnk_xp', 'iehist_xp', 'usrclass_xp'] for x in selection):
@@ -279,9 +282,9 @@ class ArtifactExtractor(volume_scanner.VolumeScanner):
                     output_path = self._get_output_path(pp, partition_type, file_entry, artifact, output_part_dir,
                                                         vsc_dir, dir_name)
                     if file_entry.IsFile():
-                        self.export_file(file_entry, output_path)
+                        self.export_file(partition_type, file_entry, output_path)
                     elif file_entry.IsDirectory():
-                        self.export_file(file_entry, output_path, artifact[3], artifact[4])
+                        self.export_file(partition_type, file_entry, output_path, artifact[3], artifact[4])
 
             if IS_OLD:  # stop processing VSCs
                 break
